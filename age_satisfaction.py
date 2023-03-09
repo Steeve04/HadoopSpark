@@ -1,4 +1,6 @@
 import csv
+import pandas as pd
+from pymongo import MongoClient
 
 def mapper(row):
     # Vérifier si la satisfaction est "satisfied" et groupé par les tranches d'âges
@@ -43,3 +45,35 @@ with open('test.csv', 'r') as csvfile:
     for key, values in results.items():
         age_satisfied = reducer(key, values)
         age_satisfied_l.append(age_satisfied)
+
+     # Stockage sous format liste de dictionnaire
+    age_dict = [{item[0]: str(item[1])} for item in age_satisfied_l]
+    # Connexion à la base de MongoDB avec user='test', password='pwd', cluster='cluster.1t7qkeq'
+    client = MongoClient("mongodb+srv://test:pwd@cluster.1t7qkeq.mongodb.net/?retryWrites=true&w=majority")
+
+    # Affectation de db à la base
+    db = client['Satisfaction']
+
+    # Affectation à la collection
+    age_collection = db['Age']
+
+    # Insertion de la liste de dictionnaire dans la collection de la base de donnée MongoDB
+    age_collection.insert_many(age_dict)
+
+    # Récupération des données sous forme de liste de dictionnaires
+    data_coll = list(age_collection.find())
+
+    # Transformation des données en DataFrame
+    df_age = pd.DataFrame(data_coll)
+
+    # Pivotage des colonnes de tranche d'âges en Age
+    df_age = df_age.melt(id_vars=['_id'], value_vars=['[>50]', '[35-50]', '[11-17]', '[18-35]', '[0-10]'], var_name='Age', value_name='Nb_satisfaction')
+    
+    # Garde seulement les cloonnes nécessaires
+    df_age = df_age[['Age', 'Nb_satisfaction']]
+    
+    # Suppression des valeurs NaN
+    df_age = df_age.dropna()
+    
+    # Déconnexion à la base
+    client.close()
