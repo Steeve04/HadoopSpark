@@ -48,6 +48,7 @@ with open('test.csv', 'r') as csvfile:
 
      # Stockage sous format liste de dictionnaire
     age_dict = [{item[0]: str(item[1])} for item in age_satisfied_l]
+    
     # Connexion à la base de MongoDB avec user='test', password='pwd', cluster='cluster.1t7qkeq'
     client = MongoClient("mongodb+srv://test:pwd@cluster.1t7qkeq.mongodb.net/?retryWrites=true&w=majority")
 
@@ -69,7 +70,7 @@ with open('test.csv', 'r') as csvfile:
     # Pivotage des colonnes de tranche d'âges en Age
     df_age = df_age.melt(id_vars=['_id'], value_vars=['[>50]', '[35-50]', '[11-17]', '[18-35]', '[0-10]'], var_name='Age', value_name='Nb_satisfaction')
     
-    # Garde seulement les cloonnes nécessaires
+    # Garde seulement les colonnes nécessaires
     df_age = df_age[['Age', 'Nb_satisfaction']]
     
     # Suppression des valeurs NaN
