@@ -39,6 +39,7 @@ with open('test.csv', 'r') as csvfile:
             results[key].append(value)
 
     # Réduire les résultats et afficher le nombre de lignes pour chaque tranche d'âge
+    age_satisfied_l = []
     for key, values in results.items():
         age_satisfied = reducer(key, values)
-        print(f'{key}: {age_satisfied}')
+        age_satisfied_l.append(age_satisfied)
