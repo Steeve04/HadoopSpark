@@ -1,4 +1,6 @@
 import csv
+import pandas as pd
+from pymongo import MongoClient
 
 def mapper(row):
     # Vérifier si la satisfaction est "satisfied" et si les colonnes critères sont égales à 5
@@ -61,3 +63,40 @@ with open('test.csv', 'r') as csvfile:
     for key, values in results.items():
         criteria_count_satisfied = reducer(key, values)
         criteria_count_satisfied_l.append(criteria_count_satisfied)
+
+    # Stockage sous format liste de dictionnaire
+    criteria_count_dict = [{item[0]: str(item[1])} for item in criteria_count_satisfied_l]
+
+    # Connexion à la base de MongoDB avec user='test', password='pwd', cluster='cluster.1t7qkeq'
+    client = MongoClient("mongodb+srv://test:pwd@cluster.1t7qkeq.mongodb.net/?retryWrites=true&w=majority")
+
+    # Affectation de db à la base
+    db = client['Satisfaction']
+
+    # Affectation à la collection
+    criteria_count_collection = db['Critere']
+
+    # Insertion de la liste de dictionnaire dans la collection de la base de donnée MongoDB
+    criteria_count_collection.insert_many(criteria_count_dict)
+
+    # Récupération des données sous forme de liste de dictionnaires
+    data_coll = list(criteria_count_collection.find())
+
+    # Transformation des données en DataFrame
+    df_criteria_count = pd.DataFrame(data_coll)
+
+    # Pivotage des colonnes satisfied et neutral or dissatisfied en Satisfaction
+    df_criteria_count = df_criteria_count.melt(id_vars=['_id'], value_vars=['Inflight wifi service', 'Food and drink', 'Seat comfort', 
+                                                                            'Checkin service', 'Leg room service', 'On-board service',
+                                                                            'Inflight service', 'Departure/Arrival time convenient',
+                                                                            'Online boarding', 'Ease of Online booking', 'Inflight entertainment',
+                                                                            'Cleanliness', 'Gate location', 'Baggage handling'], var_name='Critere', value_name='Nb_satisfaction')
+    
+    # Garde seulement les colonnes nécessaires
+    df_criteria_count = df_criteria_count[['Critere', 'Nb_satisfaction']]
+    
+    # Suppression des valeurs NaN
+    df_criteria_count = df_criteria_count.dropna()
+    
+    # Déconnexion à la base
+    client.close()
