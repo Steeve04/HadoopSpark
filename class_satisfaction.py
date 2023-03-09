@@ -35,6 +35,7 @@ with open('test.csv', 'r') as csvfile:
             results[key].append(value)
 
     # Réduire les résultats et afficher le nombre de lignes pour chaque classe
+    class_satisfied_l = []
     for key, values in results.items():
         class_satisfied = reducer(key, values)
-        print(f'{key}: {class_satisfied}')
+        class_satisfied_l.append(class_satisfied)
