@@ -57,6 +57,7 @@ with open('test.csv', 'r') as csvfile:
             results[key].append(value)
 
     # Réduire les résultats et afficher le nombre de lignes pour chaque colonne critère
+    criteria_count_satisfied_l = []
     for key, values in results.items():
         criteria_count_satisfied = reducer(key, values)
-        print(f'{key}: {criteria_count_satisfied}')
+        criteria_count_satisfied_l.append(criteria_count_satisfied)
