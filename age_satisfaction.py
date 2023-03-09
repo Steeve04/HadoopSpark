@@ -1,3 +1,5 @@
+import csv
+
 def mapper(row):
     # Vérifier si la satisfaction est "satisfied" et groupé par les tranches d'âges
     if row['satisfaction'] == 'satisfied':
