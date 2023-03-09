@@ -34,6 +34,7 @@ with open("test.csv", "r") as f:
         key, distance = mapper(row)
         results[key].append(distance)
     # Réduire les résultats en calculant la moyenne pour chaque groupe
+    average_distance_l = []
     for key, values in results.items():
         average_distance = reducer(key, values)
-        print(f"{key}: {average_distance}")
+        average_distance_l.append(average_distance)
